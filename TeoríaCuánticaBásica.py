@@ -12,3 +12,4 @@ def normveccomp(vec):
         sumatoria.append(round(abs(vec[i])**2,0))
     return sqrt(sum(sumatoria))
 xd
+coño

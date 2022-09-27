@@ -1,5 +1,5 @@
 # Libreria Operaciones Matrices y Vectores
-#### Esta libreria contiene 17 funciones, cada una hace una operación diferente con vectores y matrices.
+#### Esta libreria contiene 17 funciones, cada una hace una operación      diferente con vectores y matrices.
 #### Las funciones son:
 - advec()
 - invadvec()
