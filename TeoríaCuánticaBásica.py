@@ -25,5 +25,5 @@ def probtransi(vec1,vec2):
     normvec1=normalizavec(vec1)
     normvec2=normalizavec(vec2)
     comp=prodinterno(normvec1,normvec2)
-    norma=True ## se debe cambiar
+    norma=True ## se debe cambiar, buscar comando
     return round(norma**2,0)
