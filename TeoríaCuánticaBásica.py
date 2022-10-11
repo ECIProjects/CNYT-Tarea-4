@@ -1,27 +1,32 @@
 from math import sqrt
 import numpy as np
 
-def prob(vec,pos):
-    """calcula la probabilidad de una particula un una posición, se ingresa un vector de complejos y la posición
-    """
-    comp=vec[pos]
-    norvec2=round(normveccomp(vec)**2,0)
-    nornum2=round(abs(comp)**2,0)
-    return nornum2/norvec2
 
 def normveccomp(vec):
-    sumatoria=[]
+    sumatoria = []
     for i in range(len(vec)):
-        sumatoria.append(round(abs(vec[i])**2,0))
+        sumatoria.append(round(abs(vec[i])**2, 0))
     return sqrt(sum(sumatoria))
 
+
 def normalizavec(vec):
-    return np.linalg.norm(vec)
+    """ingresa un vector y lo retorna normalizado
+    """
+    n = np.linalg.norm(vec)
+    for i in range(len(vec)):
+        vec[i] = vec[i] / n
+    return vec
 
-def prodinterno(vec1,vec2):
-    return np.inner(vec1,vec2)
 
-def amplitrans(vec1,vect2):
+def prodinterno(vec1, vec2):
+    """ingresan dos vectores o matrices, retorna el producto interno
+    """
+    return np.inner(vec1, vec2)
+
+
+def amplitrans(vec1, vect2):
+    """ingresan dos vectores, retorna la amplitud de transición
+    """
     norm_1 = np.linalg.norm(vec1)
     norm_2 = np.linalg.norm(vect2)
     for i in range(len(vec1)):
@@ -33,60 +38,82 @@ def amplitrans(vec1,vect2):
         inner_prod += multi
     return inner_prod
 
-def probtransi(vec1,vect2):
-    return abs(amplitrans(vec1,vect2))**2
 
-def suma(a,b):
-    """retorna la suma entre dos numeros complejos"""
-    return (a[0]+b[0]),(a[1]+b[1])
+def probtransi(vec, vecpos):
+    """ingresan el vector y algún vector propio, retorna la probabilidad de que el primero transite al segundo
+    """
+    pos = vecpos.index(1)
+    normapow2 = 0
+    for i in vec:
+        normapow2 += abs(i) ** 2
+    conj = (abs(vec[pos]))**2
+    probtrans = conj / normapow2
+    return probtrans
 
-def producto(a,b):
-    """retorna el producto entre dos numeros complejos"""
-    if a==(0,0) and b==(0,0):
-        return a
-    elif a[0]==b[0] and a[1]==(b[1]*-1):
-        return (a[0]**2)+(a[1]**2),0
-    return ((a[0]*b[0])-(a[1]*b[1])),((a[0]*b[1])+(a[1]*b[0]))
 
-def valmultvecrealcomp(arr1,arr2):
-    sumai=(0,0)
-    sumatoria=0
-    x=False
-    for i in range(len(arr1)):
-        try:
-            sumai=suma(sumai,producto(arr1[i],arr2[i]))
-            x=True
-        except TypeError:
-            sumatoria+=arr1[i]*arr2[i]
-    if x:
-        return sumai
-    return sumatoria
+def accmatvec(mat, vec):
+    """ingresa una matriz y un vector, retorna la acción de la matriz sobre el vector
+    """
+    matriz = np.array(mat)
+    vector = np.array(vec)
+    prod = matriz.dot(vector)
+    return prod
 
-def accmatvec(mat,vec):
-    resp=[]
-    for i in range(len(mat)):
-        x=mat[i]
-        for j in range(len(x)):
-            y=(valmultvecrealcomp(mat[i],vec))
-        resp.append(y)
-    return resp
 
-def valoresperado(mat,vec):
+def valoresperado(mat, vec):
+    """ingresa un observable un vector key, retorna la media o valor esperado
+    """
     if ishermitian(mat):
-        omega=accmatvec(mat,vec)
-        return prodinterno(omega,vec)
-    raise Exception("Matriz no es hermitiana")
+        if np.linalg.norm(vec) != 1:
+            vec = normalizavec(vec)
+        prodmatvec = accmatvec(mat, vec)
+        media = prodinterno(prodmatvec, vec)
+        return media
+    raise Exception("Observable no es matriz hermitiana")
+
 
 def ishermitian(mat):
-    h=np.matrix.H(mat)
-    return h==mat
+    """verifica si un matriz es hermitiana
+    """
+    h = np.conjugate(mat)
+    return np.array_equal(mat, np.transpose(h))
 
 
-#a=[1j,1]
-#b=[1,-1j]
-#print("proba",probtransi(a,b))
-#print("ampli",amplitrans(a,b))
-#c=[[1,-1j],[1j,2]]
-#d=[0.707107,0.707107j]
-#print(valoresperado(c,d))
+def adjunmat(mat):
+    """ingresa una matriz y retorna su adjunta
+    """
+    h = np.conjugate(mat)
+    return np.transpose(h)
+
+
+def varianza(mat, vec):
+    """ingresa el observable y el vector ket, retorna la varianza
+    """
+    media = valoresperado(mat, vec)
+    ide = np.identity(len(vec))
+    medid = media * np.matrix(ide)
+    resta = np.matrix(mat) - np.matrix(medid)
+    prod = np.matrix(resta).dot(np.matrix(resta))
+    vari = valoresperado(prod, vec)
+    return vari
+
+
+def valprop(mat):
+    """ingresa una matriz y retorna su o sus valores propios
+    """
+    matriz = np.array(mat)
+    val, vec = np.linalg.eig(matriz)
+    return val
+
+
+def calcini(serie, estado):
+    """ingresa una serie de matrices Un y el estado final, retorna el estado inicial
+    """
+    serieinv = serie[::-1]
+    nmat = len(serie)
+    for i in range(nmat):
+        adjser = adjunmat(serieinv[i])
+        estado = accmatvec(adjser, estado)
+    return estado
+
 

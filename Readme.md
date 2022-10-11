@@ -1,8 +1,12 @@
-# Libreria Operaciones Matrices y Vectores
-#### Esta libreria contiene 2 funciones básicas de teoría cuántica
+# Libreria Operaciones Teoría Cuántica Básica, Observables y Medidas
+#### Esta libreria contiene 6 funciones que involucran observables y vectores ket
 #### Las funciones son:
-- prob()
+- amplitrans()
+- valoresperado()
+- varianza()
+- valprop()
 - probtransi()
+- calcini()
 ## Hecho Con
 - [PyCharm](https://www.jetbrains.com/es-es/pycharm/) - IDE de Python usado
 ## Autores
